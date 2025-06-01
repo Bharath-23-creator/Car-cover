@@ -1,0 +1,24 @@
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://www.olx.in/items/q-car-cover"
+
+headers = {
+    "User-Agent": "Mozilla/5.0"
+}
+
+response = requests.get(url, headers=headers)
+soup = BeautifulSoup(response.text, 'html.parser')
+listings = soup.find_all("li", class_="EIR5N")
+
+with open("car_cover_listings.txt", "w", encoding="utf-8") as file:
+    for item in listings:
+        title_tag = item.find("span")
+        link_tag = item.find("a", href=True)
+
+        if title_tag and link_tag:
+            title = title_tag.get_text(strip=True)
+            link = "https://www.olx.in" + link_tag['href']
+            file.write(f"{title}\n{link}\n\n")
+
+print("Done. Results saved to car_cover_listings.txt")
